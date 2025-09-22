@@ -1,0 +1,26 @@
+#include <vector>
+#include <string>
+#include <algorithm>
+
+class Solution {
+public:
+    std::vector<std::string> commonChars(std::vector<std::string>& words) {
+        std::vector<int> min_freq(26, 101);
+        for (const std::string& word : words) {
+            std::vector<int> current_freq(26, 0);
+            for (char c : word) {
+                current_freq[c - 'a']++;
+            }
+            for (int i = 0; i < 26; ++i) {
+                min_freq[i] = std::min(min_freq[i], current_freq[i]);
+            }
+        }
+        std::vector<std::string> result;
+        for (int i = 0; i < 26; ++i) {
+            for (int j = 0; j < min_freq[i]; ++j) {
+                result.push_back(std::string(1, 'a' + i));
+            }
+        }
+        return result;
+    }
+};
