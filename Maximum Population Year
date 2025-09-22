@@ -1,0 +1,43 @@
+#include <vector>
+#include <map>
+
+class Solution {
+public:
+    int maximumPopulation(std::vector<std::vector<int>>& logs) {
+        // A map to store population changes at specific years.
+        // key = year, value = change in population
+        std::map<int, int> population_changes;
+        
+        // Process each person's birth and death year.
+        for (const auto& log : logs) {
+            int birth_year = log[0];
+            int death_year = log[1];
+            
+            // Population increases by 1 in the birth year.
+            population_changes[birth_year]++;
+            // Population decreases by 1 in the death year.
+            population_changes[death_year]--;
+        }
+        
+        int max_population = 0;
+        int current_population = 0;
+        int earliest_year_with_max = 0;
+        
+        // Iterate through the map to calculate the population for each year.
+        for (const auto& pair : population_changes) {
+            int year = pair.first;
+            int change = pair.second;
+            
+            current_population += change;
+            
+            // If the current population is greater than the max population found so far,
+            // update the max population and the earliest year.
+            if (current_population > max_population) {
+                max_population = current_population;
+                earliest_year_with_max = year;
+            }
+        }
+        
+        return earliest_year_with_max;
+    }
+};
