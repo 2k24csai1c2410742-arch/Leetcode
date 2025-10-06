@@ -1,0 +1,116 @@
+#include <stdlib.h>
+#include <stdbool.h>
+
+// Constraints for prefix sum:
+// max length: 2 * 10^4
+// max |nums[i]|: 1000
+// max |prefix_sum|: 2 * 10^4 * 1000 = 2 * 10^7
+// The prefix sum fits within a standard int (up to 2^31 - 1).
+
+// --- Simple Hash Map implementation for (PrefixSum, Count) ---
+// Key is the prefix sum (int), Value is its frequency (int).
+
+typedef struct {
+    int key;      // Prefix Sum
+    int value;    // Frequency
+    bool occupied;
+} HashEntry;
+
+typedef struct {
+    HashEntry* table;
+    int size;
+} HashMap;
+
+// A simple hash function (mid-square, division, etc.)
+// For simplicity and to handle negative numbers, we'll use a basic approach
+// with a large prime modulus and treat the prefix sum as a potentially large number.
+// Max prefix sum is ~2*10^7. A map size of ~40000 should be okay for a quick demo.
+// For robust competitive programming, a custom hash map or using a library is better.
+#define HASH_TABLE_SIZE 30007 // A prime number slightly larger than 2 * numsSize
+
+void initHashMap(HashMap* map) {
+    map->size = HASH_TABLE_SIZE;
+    map->table = (HashEntry*)calloc(map->size, sizeof(HashEntry));
+}
+
+// Hash function that handles negative keys
+int hash(int key, int size) {
+    // A simple, positive hash index calculation
+    return (key % size + size) % size;
+}
+
+// Insert or update frequency
+void putHashMap(HashMap* map, int key, int increment) {
+    int index = hash(key, map->size);
+    int original_index = index;
+
+    while (map->table[index].occupied) {
+        if (map->table[index].key == key) {
+            map->table[index].value += increment;
+            return;
+        }
+        // Linear probing
+        index = (index + 1) % map->size;
+        if (index == original_index) {
+            // Should not happen if the size is adequate
+            return;
+        }
+    }
+    // New key
+    map->table[index].key = key;
+    map->table[index].value = increment;
+    map->table[index].occupied = true;
+}
+
+// Get value
+int getHashMap(HashMap* map, int key) {
+    int index = hash(key, map->size);
+    int original_index = index;
+
+    while (map->table[index].occupied) {
+        if (map->table[index].key == key) {
+            return map->table[index].value;
+        }
+        // Linear probing
+        index = (index + 1) % map->size;
+        if (index == original_index) {
+            break;
+        }
+    }
+    return 0; // Key not found
+}
+
+void freeHashMap(HashMap* map) {
+    free(map->table);
+}
+
+// Main function to solve the problem
+int subarraySum(int* nums, int numsSize, int k) {
+    int count = 0;
+    int current_sum = 0;
+
+    HashMap map;
+    initHashMap(&map);
+
+    // Initial state: Prefix sum 0 exists once (representing the 'empty' prefix
+    // before the array starts, allowing subarrays starting at index 0).
+    putHashMap(&map, 0, 1);
+
+    for (int i = 0; i < numsSize; i++) {
+        // 1. Update the running prefix sum
+        current_sum += nums[i];
+
+        // 2. Check for the target prefix sum (P[i] = P[j+1] - k)
+        // If we find `current_sum - k` in the map, it means there are that many
+        // starting points `i` whose prefix sum $P[i]$ satisfies the condition,
+        // forming a subarray with sum $k$ ending at the current index $j$.
+        int target_prefix_sum = current_sum - k;
+        count += getHashMap(&map, target_prefix_sum);
+
+        // 3. Store the current prefix sum and its frequency
+        putHashMap(&map, current_sum, 1);
+    }
+
+    freeHashMap(&map);
+    return count;
+}
