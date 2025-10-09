@@ -1,0 +1,49 @@
+class Solution {
+public:
+    int subarraysDivByK(vector<int>& nums, int k) {
+        unordered_map<int, int> modCount;
+        modCount[0] = 1; // Empty prefix has remainder 0
+        
+        int prefixSum = 0;
+        int result = 0;
+        
+        for (int num : nums) {
+            prefixSum += num;
+            
+            // Calculate remainder, handle negative numbers correctly
+            int mod = ((prefixSum % k) + k) % k;
+            
+            // If we've seen this remainder before, all those positions
+            // can form subarrays with current position
+            if (modCount.find(mod) != modCount.end()) {
+                result += modCount[mod];
+            }
+            
+            modCount[mod]++;
+        }
+        
+        return result;
+    }
+};
+
+// Alternative solution with array instead of hashmap (faster for small k)
+class Solution2 {
+public:
+    int subarraysDivByK(vector<int>& nums, int k) {
+        vector<int> modCount(k, 0);
+        modCount[0] = 1;
+        
+        int prefixSum = 0;
+        int result = 0;
+        
+        for (int num : nums) {
+            prefixSum += num;
+            int mod = ((prefixSum % k) + k) % k;
+            
+            result += modCount[mod];
+            modCount[mod]++;
+        }
+        
+        return result;
+    }
+};
