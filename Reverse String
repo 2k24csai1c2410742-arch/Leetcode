@@ -1,0 +1,70 @@
+#include <stddef.h> // For size_t
+
+/**
+ * @brief Reverses a string (represented as an array of characters) in-place.
+ * * This function uses the two-pointer approach to swap characters from the start 
+ * and end of the array until the pointers meet or cross, achieving O(1) extra memory usage.
+ * * @param s The input array of characters.
+ * @param sSize The number of characters in the array.
+ */
+void reverseString(char* s, size_t sSize) {
+    // Check for edge cases: empty array or single-element array, where no action is needed.
+    if (s == NULL || sSize <= 1) {
+        return;
+    }
+
+    // Initialize two pointers: 'left' at the start and 'right' at the end.
+    size_t left = 0;
+    size_t right = sSize - 1;
+
+    // Continue swapping as long as the left pointer is to the left of the right pointer.
+    while (left < right) {
+        // 1. Swap the characters at the left and right pointers.
+        char temp = s[left];
+        s[left] = s[right];
+        s[right] = temp;
+
+        // 2. Move the pointers towards the center.
+        left++;
+        right--;
+    }
+}
+
+/*
+// Example Usage (for testing locally, not included in the final solution file):
+#include <stdio.h>
+
+void printArray(char* arr, size_t size) {
+    printf("[");
+    for (size_t i = 0; i < size; i++) {
+        printf("\"%c\"%s", arr[i], (i == size - 1) ? "" : ",");
+    }
+    printf("]\n");
+}
+
+int main() {
+    // Example 1: s = ["h","e","l","l","o"]
+    char s1[] = {'h', 'e', 'l', 'l', 'o'};
+    size_t size1 = sizeof(s1) / sizeof(s1[0]);
+    printf("Original 1: ");
+    printArray(s1, size1);
+    
+    reverseString(s1, size1);
+    
+    printf("Reversed 1: ");
+    printArray(s1, size1); // Expected: ["o","l","l","e","h"]
+
+    // Example 2: s = ["H","a","n","n","a","h"]
+    char s2[] = {'H', 'a', 'n', 'n', 'a', 'h'};
+    size_t size2 = sizeof(s2) / sizeof(s2[0]);
+    printf("Original 2: ");
+    printArray(s2, size2);
+    
+    reverseString(s2, size2);
+    
+    printf("Reversed 2: ");
+    printArray(s2, size2); // Expected: ["h","a","n","n","a","H"]
+    
+    return 0;
+}
+*/
